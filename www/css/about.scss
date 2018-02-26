@@ -1,0 +1,145 @@
+page-about {
+	.fundo{
+		width:100%;
+		height:100%;
+		overflow-x: hidden;
+		overflow-y: hidden;
+		
+	}
+	.imagem-wrapper {
+		width: 256px;
+		height: 226px;
+		left: 50%;
+		top:30%;
+		margin-top:-113px;
+		margin-left:-128px;
+		overflow: hidden;
+		position: relative;/* Para fazer que a imagem com position-absolute respeite a sua posição consoante este selector, ou evitar que saia do mesmo */
+		background: none; /*#32CD32; */
+	}
+	.imagem {
+		width: 642px;
+		/*height: 596px;*/
+		/* código abaixo centra a imagem ao centro */
+		position: absolute;
+		top: -44px;
+		left: -193px;
+		transform: translateX(-0%) translateY(-0%);
+		/*clip: rect(10px, 580px, 160px, 100px);*/
+		max-width: none !important;
+		z-index:100;
+	}
+	
+	.fundo-city {
+		width: 642px;
+		/*height: 596px;*/
+		/* código abaixo centra a imagem ao centro */
+		position: absolute;
+		bottom: 0px;
+		left: -193px;
+		transform: translateX(-0%) translateY(-0%);
+		/*clip: rect(10px, 580px, 160px, 100px);*/
+		max-width: none !important;
+		z-index:50;
+	}
+	.body{
+		height:70%;
+		width:100%;
+		top:30%;
+		position: absolute;
+		left: 0%;
+		background: #FFF;
+		z-index:40;
+		
+	}
+	
+	.tri1{
+		height:0px;
+		width:0px;
+		top:0%;
+		position: absolute;
+		left: 0%;
+		border:100px solid #FFF;
+		border-top:100px solid transparent;
+		border-right:100px solid transparent;
+		z-index:90;
+		
+	}
+	.tri2{
+		height:0px;
+		width:0px;
+		top:0%;
+		position: absolute;
+		right: 0%;
+		border:100px solid #FFF;
+		border-top:100px solid transparent;
+		border-left:100px solid transparent;
+		z-index:90;
+		
+	}
+	.circulo{
+		height:300px;
+		width:300px;
+		margin-top:-150px;
+		margin-left:-150px;
+		position: absolute;
+		left: 50%;
+		top:30%;
+		border:1px solid #32CD32;
+		border-radius: 50%;
+		z-index:50;
+		animation-name: cirulosLogo1;
+		animation-duration: 4s;
+		animation-iteration-count: infinite;  
+		animation-timing-function: linear; 
+	}
+	
+	.circulo2{
+		position: absolute;
+		left: 50%;
+		top:30%;
+		border:1px solid #32CD32;
+		border-radius: 50%;
+		z-index:50;
+		animation-name: cirulosLogo1;
+		animation-duration: 4s;
+		animation-delay: 2s;
+		animation-iteration-count: infinite;  
+		animation-timing-function: linear; 
+	}
+	@keyframes cirulosLogo1 {
+		0%   {
+		height:260px;
+		width:260px;
+		margin-top:-130px;
+		margin-left:-130px;
+		opacity: 0;
+		}
+		100% {
+			height:600px;
+			width:600px;
+		margin-top:-300px;
+		margin-left:-300px;
+		opacity: 1;
+		}
+	}
+
+	
+	.iniciar-button{
+		color: #32CD32;
+		border:1px solid #32CD32;
+		font-size:18px;
+		z-index:110;
+		top:400px;
+		width:100px;
+		left:50%;
+		margin-left:-50px;
+		position: absolute;
+		background: transparent;
+		padding:10px;
+		
+	}
+	
+	
+	
+}

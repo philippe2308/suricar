@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+    <body onload="onLoad()">
+	<input type="file" id="file"/>
+</body>
+    <script type="text/javascript" src="meyda.min.js"></script>
+    <script type="text/javascript" src="numjs.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript" src="brain-0.6.3.js"></script>
+<script>
+// capture callback
+var captureSuccess = function(mediaFiles) {
+    var i, path, len;
+    for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+        path = mediaFiles[i].fullPath;
+        // do something interesting with the file
+    }
+};
+
+// capture error callback
+var captureError = function(error) {
+    navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+};
+function onLoad() {
+    document.addEventListener("deviceready", onDeviceReady, false);
+}
+function onDeviceReady() {
+    console.log(navigator.device.capture);// start audio capture
+	navigator.device.capture.captureAudio(captureSuccess, captureError, {limit:2});
+
+}
+
+
+
+//Objeto da rede neural.
+var net = new brain.NeuralNetwork();
+//Arquivo que será lido. Obs.: Abertura do microfone.
+var nomeArquivo = '4-90014-A.wav';
+//Ao terminar de carregar a pagina HTML/Aplicativo, realiza a leitura do json.
+$(document).ready(init);
+
+//Carrega o JSON assim que abrir o aplicativo!
+function init() {
+ loadJSON(function(response) {
+	actual_JSON = JSON.parse(response);
+	net.fromJSON(actual_JSON);
+	getData();//Irá abrir audio e fazer extração de MFCC.
+ });
+}
+//Leitura do json com a rede neural.
+function loadJSON(callback) 
+{
+	var xobj = new XMLHttpRequest();
+	xobj.overrideMimeType("application/json");
+	xobj.open('GET', 'pesosRedeReduzido.json', true);
+	xobj.onreadystatechange = function () {
+		if (xobj.readyState == 4 && xobj.status == "200") {
+		callback(xobj.responseText);
+		}
+	};
+	xobj.send(null);  
+}
+//Realiza a predição do arquivo lido.
+function predicao(pred)
+{
+	var run = net.toFunction();
+	var output = net.run(pred);
+	//A saída será um objeto com dois atributos que serão as classes da rede. 
+	//Sendo que são valores de probabilidade de ser ou não.
+	//Setar o que for maior que 0.85 para aparecer na tela.
+	console.log(output);
+}
+
+var context = new (window.AudioContext || window.webkitAudioContext)();
+//abrir o microfone e chamar esse metodo de extração.
+function getData() 
+{
+  source = context.createBufferSource();
+  request = new XMLHttpRequest();
+
+  request.open('GET',nomeArquivo, true);
+
+  request.responseType = 'arraybuffer';
+  request.onload = function() {
+  audioData = request.response;
+  context.decodeAudioData(audioData).then(function(decodedData) {
+		myBuffer = decodedData;
+		source.buffer = myBuffer;
+		arrayFloat32 = new Float32Array(decodedData.getChannelData(0));
+		source.connect(context.destination);
+		var vetorMfccExtraido = extractMfcc(source);
+		var vetorMfccMedia = media(vetorMfccExtraido);
+		predicao(vetorMfccMedia);
+	  },
+	  function(e){"Error with decoding audio data" + e.err});
+
+  }
+  request.send();
+}
+function media(vetor)
+{
+  var vetorFinal = [];
+  for (var i = 0; i < 13; i++) 
+  {  
+	var colAux = [];
+	for (var j= 0; j < vetor.length-1; j++) 
+	{
+		var res = vetor[j][i];
+		colAux.push(res);
+	}
+	vetorFinal.push(nj.mean(colAux));
+  }
+  return vetorFinal;
+}
+//VERIFICAR SE O VETOR DE MFCC ESTÁ SENDO ALTERADO, A CADA AUDIO NOVO PASSADO.
+var extractMfcc = (source, sampleRate = 1024) =>{
+  var channelData = source.buffer.getChannelData(0);
+  var arraySinalMfcc = [];
+  for (var i = 0; i<channelData.length - sampleRate;i+= sampleRate) 
+  {
+	var r = Meyda.extract('mfcc',channelData.slice(i,i+sampleRate));
+	arraySinalMfcc.push(r);
+  }
+  return arraySinalMfcc;
+}
+
+
+
+var captureError = function(e) {
+    console.log('captureError' ,e);
+}
+
+var captureSuccess = function(e) {
+    console.log('captureSuccess');console.dir(e);
+    $scope.sound.file = e[0].localURL;
+    $scope.sound.filePath = e[0].fullPath;
+}
+
+$scope.record = function() {
+    navigator.device.capture.captureAudio(
+        captureSuccess,captureError,{duration:10});
+}
+
+$scope.play = function() {
+    if(!$scope.sound.file) {
+        navigator.notification.alert("Record a sound first.", null, "Error");
+        return;
+    }
+    var media = new Media($scope.sound.file, function(e) {
+        media.release();
+    }, function(err) {
+        console.log("media err", err);
+    });
+    media.play();
+}
+</script>
+</html>
